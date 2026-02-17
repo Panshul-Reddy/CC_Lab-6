@@ -48,12 +48,12 @@ pipeline {
                 
                 docker run -d \
                   --name nginx-lb \
-                  --network app-network \
+                  --link backend1 \
+                  --link backend2 \
                   -p 80:80 \
                   nginx
                 
-                echo "Waiting for Docker DNS..."
-                sleep 10
+                sleep 5
                 
                 docker cp nginx/default.conf nginx-lb:/etc/nginx/conf.d/default.conf
                 
