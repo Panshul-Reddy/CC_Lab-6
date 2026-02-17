@@ -36,7 +36,7 @@ pipeline {
                   backend-app
                 
                 echo "Waiting for backend containers..."
-                sleep 10
+                sleep 15
                 '''
             }
         }
@@ -48,14 +48,18 @@ pipeline {
                 
                 docker run -d \
                   --name nginx-lb \
-                  --link backend1 \
-                  --link backend2 \
+                  --network app-network \
                   -p 80:80 \
                   nginx
                 
-                sleep 5
+                echo "Waiting for nginx to start..."
+                sleep 10
                 
                 docker cp nginx/default.conf nginx-lb:/etc/nginx/conf.d/default.conf
+                
+                echo "Testing backend resolution..."
+                docker exec nginx-lb ping -c 2 backend1 || true
+                docker exec nginx-lb ping -c 2 backend2 || true
                 
                 sleep 5
                 
